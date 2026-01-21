@@ -1,8 +1,8 @@
-// Импортируем необходимые функции Firebase модульного SDK через CDN
+// Import necessary Firebase functions from the Modular SDK via CDN
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getDatabase, ref, push, set, onValue, query, orderByChild } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-// Конфигурация твоего проекта URSA IPA
+// Your URSA IPA project configuration
 const firebaseConfig = {
   apiKey: "AIzaSyCQxz47mev45XXLz3ejJViVQCzFL_Fo3z8",
   authDomain: "ursaipa.firebaseapp.com",
@@ -14,74 +14,84 @@ const firebaseConfig = {
   measurementId: "G-RWFQ47DLHS"
 };
 
-// Инициализация Firebase приложения и базы данных
+// Initialize Firebase App and Database
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
 /**
- * Функция добавления новой игры.
- * Привязана к глобальному объекту window, чтобы работать через onclick в HTML.
+ * Function to add a new game.
+ * Attached to the global window object to work with the HTML onclick attribute.
  */
 window.addGame = function() {
     const urlInput = document.getElementById('appUrl');
     const url = urlInput.value.trim();
 
-    // Простая валидация ввода
+    // Simple input validation
     if (url === "") {
-        alert("Бро, вставь ссылку!");
+        alert("Please paste a link!");
         return;
     }
 
-    // Ссылка на узел 'games' в Realtime Database
+    // Reference to the 'games' node in Realtime Database
     const gamesRef = ref(db, 'games');
     const newGameRef = push(gamesRef);
     
-    // Запись данных в базу
+    // Save data to the database
     set(newGameRef, {
         url: url,
-        status: "Проверяется", // Статус по умолчанию при регистрации
-        timestamp: Date.now()   // Время добавления для сортировки
+        status: "Pending", // Default status upon registration
+        timestamp: Date.now() // Timestamp used for sorting
     }).then(() => {
-        urlInput.value = ""; // Очистка поля ввода при успехе
-        console.log("Заявка успешно отправлена!");
+        urlInput.value = ""; // Clear input field on success
+        console.log("Request sent successfully!");
     }).catch((error) => {
-        alert("Ошибка доступа! Проверь настройки Rules в консоли Firebase.");
+        alert("Access denied! Check your Security Rules in the Firebase console.");
         console.error(error);
     });
 };
 
 /**
- * Подписка на обновления базы данных в реальном времени.
- * Сортирует заявки по времени добавления.
+ * Subscribe to real-time database updates.
+ * Sorts requests by the time they were added.
  */
 const gamesDisplayRef = query(ref(db, 'games'), orderByChild('timestamp'));
 
 onValue(gamesDisplayRef, (snapshot) => {
     const gamesList = document.getElementById('gamesList');
-    gamesList.innerHTML = ""; // Очистка таблицы перед отрисовкой новых данных
+    gamesList.innerHTML = ""; // Clear the table before rendering updated data
 
     if (snapshot.exists()) {
         snapshot.forEach((childSnapshot) => {
             const game = childSnapshot.val();
             
-            // Логика выбора CSS класса в зависимости от текущего статуса
+            // Logic to select the CSS class and display text based on current status
             let statusClass = "status-default";
-            if (game.status === "В работе") statusClass = "status-working";
-            if (game.status === "Готово") statusClass = "status-ready";
+            let displayStatus = game.status;
+
+            // Handle English status names for consistency
+            if (game.status === "В работе" || game.status === "Processing") {
+                statusClass = "status-working";
+                displayStatus = "Processing";
+            } else if (game.status === "Готово" || game.status === "Ready") {
+                statusClass = "status-ready";
+                displayStatus = "Ready";
+            } else {
+                displayStatus = "Pending";
+            }
 
             const row = `
                 <tr>
                     <td><a href="${game.url}" target="_blank">${game.url}</a></td>
-                    <td><b class="${statusClass}">${game.status}</b></td>
+                    <td><b class="${statusClass}">${displayStatus}</b></td>
                 </tr>
             `;
             
-            // Вставляем новую строку в начало таблицы
+            // Insert the new row at the beginning of the table
             gamesList.insertAdjacentHTML('afterbegin', row);
         });
     } else {
-        gamesList.innerHTML = "<tr><td colspan='2' style='text-align:center;'>Список заявок пуст...</td></tr>";
+        gamesList.innerHTML = "<tr><td colspan='2' style='text-align:center;'>No requests found...</td></tr>";
     }
 }, (error) => {
-    console.error("Ошибка при получении данных: ", error);
+    console.error("Error retrieving data: ", error);
 });
