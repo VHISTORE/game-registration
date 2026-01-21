@@ -1,0 +1,96 @@
+/* Базовый дизайн в стиле URSA */
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background-color: #0f0f0f;
+    color: #ffffff;
+    display: flex;
+    justify-content: center;
+    padding: 20px;
+}
+
+.container {
+    width: 100%;
+    max-width: 800px;
+    background: #1a1a1a;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+
+h1, h2 { 
+    text-align: center; 
+    color: #007aff; 
+}
+
+.add-box {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+input {
+    flex: 1;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #333;
+    background: #252525;
+    color: #fff;
+    outline: none;
+}
+
+button {
+    padding: 12px 20px;
+    background-color: #007aff;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+button:hover { 
+    background-color: #0056b3; 
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    background: #252525;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+th, td {
+    padding: 15px;
+    text-align: left;
+    border-bottom: 1px solid #333;
+}
+
+th { 
+    background: #333; 
+    color: #007aff; 
+}
+
+/* Цвета статусов */
+.status-default { color: #aaa; }
+.status-working { color: #ff9f0a; } /* Оранжевый */
+.status-ready { color: #30d158; }   /* Зеленый */
+
+a { 
+    color: #0a84ff; 
+    text-decoration: none; 
+    word-break: break-all; 
+}
+
+a:hover { 
+    text-decoration: underline; 
+}
+
+hr {
+    border: 0; 
+    height: 1px; 
+    background: #333; 
+    margin: 30px 0;
+}
