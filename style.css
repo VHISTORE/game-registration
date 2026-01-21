@@ -6,6 +6,7 @@ body {
     display: flex;
     justify-content: center;
     padding: 20px;
+    margin: 0;
 }
 
 .container {
@@ -22,6 +23,7 @@ h1, h2 {
     color: #007aff; 
 }
 
+/* Форма добавления */
 .add-box {
     display: flex;
     gap: 10px;
@@ -36,6 +38,11 @@ input {
     background: #252525;
     color: #fff;
     outline: none;
+    transition: border 0.3s;
+}
+
+input:focus {
+    border-color: #007aff;
 }
 
 button {
@@ -53,6 +60,7 @@ button:hover {
     background-color: #0056b3; 
 }
 
+/* Стили таблицы */
 table {
     width: 100%;
     border-collapse: collapse;
@@ -71,21 +79,55 @@ th, td {
 th { 
     background: #333; 
     color: #007aff; 
+    text-transform: uppercase;
+    font-size: 12px;
+    letter-spacing: 0.5px;
+}
+
+/* Ячейка с приложением (Иконка + Имя) */
+.app-cell {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.app-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px; /* iOS style corners */
+    object-fit: cover;
+    border: 1px solid #333;
+    background-color: #1a1a1a;
+}
+
+.app-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.app-name {
+    font-weight: 600;
+    color: #fff;
+    text-decoration: none;
+    font-size: 15px;
+    transition: color 0.2s;
+}
+
+.app-name:hover {
+    color: #0a84ff;
+    text-decoration: underline;
 }
 
 /* Цвета статусов */
-.status-default { color: #aaa; }
-.status-working { color: #ff9f0a; } /* Оранжевый */
-.status-ready { color: #30d158; }   /* Зеленый */
+.status-default { color: #aaa; }             /* Pending */
+.status-working { color: #ff9f0a; }             /* Processing (Orange) */
+.status-ready { color: #30d158; }               /* Ready (Green) */
 
+/* Стили для ссылок и разделителя */
 a { 
     color: #0a84ff; 
     text-decoration: none; 
     word-break: break-all; 
-}
-
-a:hover { 
-    text-decoration: underline; 
 }
 
 hr {
@@ -94,28 +136,34 @@ hr {
     background: #333; 
     margin: 30px 0;
 }
-.app-cell {
+
+/* --- СТИЛИ ДЛЯ АДМИН-ПАНЕЛИ --- */
+
+.admin-controls {
     display: flex;
-    align-items: center;
-    gap: 12px;
+    gap: 8px;
 }
 
-.app-icon {
-    width: 40px;
-    height: 40px;
-    border-radius: 10px; /* iOS style corners */
-    object-fit: cover;
-    border: 1px solid #333;
+.btn-status {
+    padding: 6px 12px;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
-.app-name {
-    font-weight: 600;
-    color: #fff;
-    text-decoration: none;
-    font-size: 14px;
-}
+.btn-work { background-color: #ff9f0a; }
+.btn-work:hover { background-color: #d68400; }
 
-.app-name:hover {
-    color: #007aff;
-    text-decoration: underline;
+.btn-ready { background-color: #30d158; }
+.btn-ready:hover { background-color: #24a142; }
+
+.btn-delete { 
+    background-color: #ff3b30; 
+    padding: 6px 10px;
+}
+.btn-delete:hover { background-color: #d32f2f; }
+
+#login-section {
+    padding: 50px 0;
+    text-align: center;
 }
