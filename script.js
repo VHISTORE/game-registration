@@ -15,13 +15,14 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
-// Function to get App info from iTunes API
+// New function to fetch metadata from Apple
 async function fetchAppData(appUrl) {
     try {
-        const appIdMatch = appUrl.match(/id(\12\d+)/); // Extracts numbers after 'id'
-        if (!appIdMatch) return { name: "Unknown App", icon: "" };
+        const appIdMatch = appUrl.match(/id(\d+)/); 
+        if (!appIdMatch) return { name: "Unknown App", icon: "https://placehold.jp/40x40.png" };
 
         const appId = appIdMatch[1];
+        // Using a proxy or direct fetch to iTunes Search API
         const response = await fetch(`https://itunes.apple.com/lookup?id=${appId}`);
         const data = await response.json();
 
@@ -34,7 +35,7 @@ async function fetchAppData(appUrl) {
     } catch (e) {
         console.error("Meta fetch error", e);
     }
-    return { name: "Unknown App", icon: "" };
+    return { name: "Unknown App", icon: "https://placehold.jp/40x40.png" };
 }
 
 window.addGame = async function() {
@@ -46,7 +47,7 @@ window.addGame = async function() {
         return;
     }
 
-    // Fetch name and icon before saving to Firebase
+    // Fetch the name and icon BEFORE saving to Firebase
     const appData = await fetchAppData(url);
 
     const gamesRef = ref(db, 'games');
@@ -54,8 +55,8 @@ window.addGame = async function() {
     
     set(newGameRef, {
         url: url,
-        appName: appData.name,   // Saving Name
-        appIcon: appData.icon,   // Saving Icon URL
+        appName: appData.name,   
+        appIcon: appData.icon,   
         status: "Pending",
         timestamp: Date.now()
     }).then(() => {
@@ -78,24 +79,19 @@ onValue(gamesDisplayRef, (snapshot) => {
             const game = childSnapshot.val();
             
             let statusClass = "status-default";
-            let displayStatus = game.status;
+            if (game.status === "Processing") statusClass = "status-working";
+            if (game.status === "Ready") statusClass = "status-ready";
 
-            if (game.status === "Processing") {
-                statusClass = "status-working";
-            } else if (game.status === "Ready") {
-                statusClass = "status-ready";
-            }
-
-            // Using stored appIcon and appName, fallback to URL if metadata missing
+            // If it's an old entry without a name, it defaults to the URL or Unknown
             const row = `
                 <tr>
                     <td class="app-cell">
-                        <img src="${game.appIcon || 'https://via.placeholder.com/40'}" class="app-icon" alt="icon">
+                        <img src="${game.appIcon || 'https://placehold.jp/40x40.png'}" class="app-icon" alt="icon">
                         <div class="app-info">
                             <a href="${game.url}" target="_blank" class="app-name">${game.appName || 'Unknown App'}</a>
                         </div>
                     </td>
-                    <td><b class="${statusClass}">${displayStatus}</b></td>
+                    <td><b class="${statusClass}">${game.status}</b></td>
                 </tr>
             `;
             gamesList.insertAdjacentHTML('afterbegin', row);
