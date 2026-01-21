@@ -94,3 +94,28 @@ hr {
     background: #333; 
     margin: 30px 0;
 }
+.app-cell {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.app-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px; /* iOS style corners */
+    object-fit: cover;
+    border: 1px solid #333;
+}
+
+.app-name {
+    font-weight: 600;
+    color: #fff;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.app-name:hover {
+    color: #007aff;
+    text-decoration: underline;
+}
