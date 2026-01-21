@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,25 +8,25 @@
 </head>
 <body>
     <div class="container">
-        <h1>Регистрация игр AppStore</h1>
+        <h1>AppStore Game Registration</h1>
         
         <div class="add-box">
-            <input type="text" id="appUrl" placeholder="Вставьте ссылку на AppStore (https://apps.apple.com/...)">
-            <button onclick="addGame()">Зарегистрировать</button>
+            <input type="text" id="appUrl" placeholder="Paste AppStore link (https://apps.apple.com/...)">
+            <button onclick="addGame()">Register</button>
         </div>
 
         <hr>
 
-        <h2>Список приложений</h2>
+        <h2>Application List</h2>
         <table id="gamesTable">
             <thead>
                 <tr>
-                    <th>Ссылка</th>
-                    <th>Статус</th>
+                    <th>Link</th>
+                    <th>Status</th>
                 </tr>
             </thead>
             <tbody id="gamesList">
-                <tr><td colspan="2" style="text-align:center;">Загрузка списка...</td></tr>
+                <tr><td colspan="2" style="text-align:center;">Loading list...</td></tr>
             </tbody>
         </table>
     </div>
