@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>URSA Admin Panel</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .admin-controls { display: flex; gap: 5px; }
+        .btn-status { padding: 5px 10px; font-size: 12px; }
+        .btn-delete { background-color: #ff3b30; }
+        .btn-work { background-color: #ff9f0a; }
+        .btn-ready { background-color: #30d158; }
+        #login-section { text-align: center; margin-top: 50px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Панель администратора URSA</h1>
+
+        <div id="login-section">
+            <p>Для управления нужно войти через Google:</p>
+            <button onclick="login()">Войти как Админ</button>
+        </div>
+
+        <div id="admin-section" style="display: none;">
+            <h2>Управление заявками</h2>
+            <table id="adminTable">
+                <thead>
+                    <tr>
+                        <th>Ссылка</th>
+                        <th>Статус</th>
+                        <th>Действие</th>
+                    </tr>
+                </thead>
+                <tbody id="adminList">
+                    </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script type="module" src="admin.js"></script>
+</body>
+</html>
