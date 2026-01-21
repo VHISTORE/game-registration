@@ -15,7 +15,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
-// Функция для получения названия и иконки из iTunes API
+// Helper function to fetch name and icon from iTunes API
 async function fetchAppData(appUrl) {
     try {
         const appIdMatch = appUrl.match(/id(\d+)/); 
@@ -42,11 +42,10 @@ window.addGame = async function() {
     const url = urlInput.value.trim();
 
     if (url === "") {
-        alert("Please paste a link!");
+        alert("Please paste an AppStore link!");
         return;
     }
 
-    // Сначала получаем данные приложения
     const appData = await fetchAppData(url);
 
     const gamesRef = ref(db, 'games');
@@ -56,13 +55,13 @@ window.addGame = async function() {
         url: url,
         appName: appData.name,   
         appIcon: appData.icon,   
-        status: "Pending",
+        status: "Pending", // Default English status
         timestamp: Date.now()
     }).then(() => {
         urlInput.value = "";
         console.log("Request sent successfully!");
     }).catch((error) => {
-        alert("Access denied!");
+        alert("Access denied! Please check your permissions.");
         console.error(error);
     });
 };
@@ -78,8 +77,18 @@ onValue(gamesDisplayRef, (snapshot) => {
             const game = childSnapshot.val();
             
             let statusClass = "status-default";
-            if (game.status === "Processing" || game.status === "В работе") statusClass = "status-working";
-            if (game.status === "Ready" || game.status === "Готово") statusClass = "status-ready";
+            let displayStatus = game.status;
+
+            // Handle legacy Russian statuses and English mapping
+            if (game.status === "Processing" || game.status === "В работе") {
+                statusClass = "status-working";
+                displayStatus = "Processing";
+            } else if (game.status === "Ready" || game.status === "Готово") {
+                statusClass = "status-ready";
+                displayStatus = "Ready";
+            } else {
+                displayStatus = "Pending";
+            }
 
             const row = `
                 <tr>
@@ -89,7 +98,7 @@ onValue(gamesDisplayRef, (snapshot) => {
                             <a href="${game.url}" target="_blank" class="app-name">${game.appName || 'Unknown App'}</a>
                         </div>
                     </td>
-                    <td><b class="${statusClass}">${game.status}</b></td>
+                    <td><b class="${statusClass}">${displayStatus}</b></td>
                 </tr>
             `;
             gamesList.insertAdjacentHTML('afterbegin', row);
