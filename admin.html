@@ -1,13 +1,23 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>URSA Admin Panel</title>
     <link rel="stylesheet" href="style.css">
     <style>
-        .admin-controls { display: flex; gap: 5px; }
-        .btn-status { padding: 5px 10px; font-size: 12px; }
+        .admin-controls { display: flex; gap: 8px; }
+        .btn-status { 
+            padding: 6px 12px; 
+            font-size: 11px; 
+            text-transform: uppercase; 
+            letter-spacing: 0.5px; 
+            font-weight: bold; 
+            border-radius: 5px; 
+            border: none; 
+            cursor: pointer; 
+            color: white; 
+        }
         .btn-delete { background-color: #ff3b30; }
         .btn-work { background-color: #ff9f0a; }
         .btn-ready { background-color: #30d158; }
@@ -16,21 +26,21 @@
 </head>
 <body>
     <div class="container">
-        <h1>Панель администратора URSA</h1>
+        <h1>URSA Admin Panel</h1>
 
         <div id="login-section">
-            <p>Для управления нужно войти через Google:</p>
-            <button onclick="login()">Войти как Админ</button>
+            <p>Please log in with Google to manage requests:</p>
+            <button onclick="login()">Login as Admin</button>
         </div>
 
         <div id="admin-section" style="display: none;">
-            <h2>Управление заявками</h2>
+            <h2>Manage Requests</h2>
             <table id="adminTable">
                 <thead>
                     <tr>
-                        <th>Ссылка</th>
-                        <th>Статус</th>
-                        <th>Действие</th>
+                        <th>App</th>
+                        <th>Status</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody id="adminList">
