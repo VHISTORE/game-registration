@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>URSA Registry</title>
+    <link rel="stylesheet" href="style.css"> </head>
+<body>
+    <div class="container">
+        <h1>Регистрация игр AppStore</h1>
+        
+        <div class="add-box">
+            <input type="text" id="appUrl" placeholder="Вставьте ссылку на AppStore">
+            <button onclick="addGame()">Зарегистрировать</button>
+        </div>
+
+        <hr>
+
+        <h2>Список приложений</h2>
+        <table border="1" id="gamesTable" style="width:100%; text-align: left;">
+            <thead>
+                <tr>
+                    <th>Ссылка</th>
+                    <th>Статус</th>
+                </tr>
+            </thead>
+            <tbody id="gamesList">
+                </tbody>
+        </table>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
