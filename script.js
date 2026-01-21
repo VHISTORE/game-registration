@@ -15,14 +15,13 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
-// New function to fetch metadata from Apple
+// Функция для получения названия и иконки из iTunes API
 async function fetchAppData(appUrl) {
     try {
         const appIdMatch = appUrl.match(/id(\d+)/); 
         if (!appIdMatch) return { name: "Unknown App", icon: "https://placehold.jp/40x40.png" };
 
         const appId = appIdMatch[1];
-        // Using a proxy or direct fetch to iTunes Search API
         const response = await fetch(`https://itunes.apple.com/lookup?id=${appId}`);
         const data = await response.json();
 
@@ -33,7 +32,7 @@ async function fetchAppData(appUrl) {
             };
         }
     } catch (e) {
-        console.error("Meta fetch error", e);
+        console.error("Fetch error:", e);
     }
     return { name: "Unknown App", icon: "https://placehold.jp/40x40.png" };
 }
@@ -47,7 +46,7 @@ window.addGame = async function() {
         return;
     }
 
-    // Fetch the name and icon BEFORE saving to Firebase
+    // Сначала получаем данные приложения
     const appData = await fetchAppData(url);
 
     const gamesRef = ref(db, 'games');
@@ -79,10 +78,9 @@ onValue(gamesDisplayRef, (snapshot) => {
             const game = childSnapshot.val();
             
             let statusClass = "status-default";
-            if (game.status === "Processing") statusClass = "status-working";
-            if (game.status === "Ready") statusClass = "status-ready";
+            if (game.status === "Processing" || game.status === "В работе") statusClass = "status-working";
+            if (game.status === "Ready" || game.status === "Готово") statusClass = "status-ready";
 
-            // If it's an old entry without a name, it defaults to the URL or Unknown
             const row = `
                 <tr>
                     <td class="app-cell">
