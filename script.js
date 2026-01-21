@@ -1,8 +1,8 @@
-// Импортируем нужные функции из Firebase CDN
+// Импортируем необходимые функции Firebase модульного SDK через CDN
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getDatabase, ref, push, set, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+import { getDatabase, ref, push, set, onValue, query, orderByChild } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-// Твой конфиг
+// Конфигурация твоего проекта URSA IPA
 const firebaseConfig = {
   apiKey: "AIzaSyCQxz47mev45XXLz3ejJViVQCzFL_Fo3z8",
   authDomain: "ursaipa.firebaseapp.com",
@@ -14,64 +14,74 @@ const firebaseConfig = {
   measurementId: "G-RWFQ47DLHS"
 };
 
-// Инициализация
+// Инициализация Firebase приложения и базы данных
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
-// Делаем функцию доступной для кнопки в HTML
+/**
+ * Функция добавления новой игры.
+ * Привязана к глобальному объекту window, чтобы работать через onclick в HTML.
+ */
 window.addGame = function() {
     const urlInput = document.getElementById('appUrl');
     const url = urlInput.value.trim();
 
+    // Простая валидация ввода
     if (url === "") {
         alert("Бро, вставь ссылку!");
         return;
     }
 
-    // Сохраняем в базу (узел 'games')
+    // Ссылка на узел 'games' в Realtime Database
     const gamesRef = ref(db, 'games');
     const newGameRef = push(gamesRef);
     
+    // Запись данных в базу
     set(newGameRef, {
         url: url,
-        status: "Проверяется", // Начальный статус
-        timestamp: Date.now()
+        status: "Проверяется", // Статус по умолчанию при регистрации
+        timestamp: Date.now()   // Время добавления для сортировки
     }).then(() => {
-        urlInput.value = ""; // Очищаем поле
-        console.log("Данные успешно отправлены!");
+        urlInput.value = ""; // Очистка поля ввода при успехе
+        console.log("Заявка успешно отправлена!");
     }).catch((error) => {
-        alert("Ошибка! Проверь Rules в Firebase");
+        alert("Ошибка доступа! Проверь настройки Rules в консоли Firebase.");
         console.error(error);
     });
 };
 
-// Слушаем изменения в базе в реальном времени
-const gamesDisplayRef = ref(db, 'games');
+/**
+ * Подписка на обновления базы данных в реальном времени.
+ * Сортирует заявки по времени добавления.
+ */
+const gamesDisplayRef = query(ref(db, 'games'), orderByChild('timestamp'));
+
 onValue(gamesDisplayRef, (snapshot) => {
     const gamesList = document.getElementById('gamesList');
-    gamesList.innerHTML = ""; // Чистим таблицу перед обновлением
+    gamesList.innerHTML = ""; // Очистка таблицы перед отрисовкой новых данных
 
     if (snapshot.exists()) {
-        const data = snapshot.val();
-        
-        // Перебираем объекты и выводим в таблицу
-        Object.keys(data).forEach((key) => {
-            const game = data[key];
+        snapshot.forEach((childSnapshot) => {
+            const game = childSnapshot.val();
             
-            // Определяем цвет текста в зависимости от статуса (для CSS)
+            // Логика выбора CSS класса в зависимости от текущего статуса
             let statusClass = "status-default";
             if (game.status === "В работе") statusClass = "status-working";
             if (game.status === "Готово") statusClass = "status-ready";
 
             const row = `
                 <tr>
-                    <td><a href="${game.url}" target="_blank" style="color: #fff;">${game.url}</a></td>
+                    <td><a href="${game.url}" target="_blank">${game.url}</a></td>
                     <td><b class="${statusClass}">${game.status}</b></td>
                 </tr>
             `;
-            gamesList.insertAdjacentHTML('afterbegin', row); // Новые сверху
+            
+            // Вставляем новую строку в начало таблицы
+            gamesList.insertAdjacentHTML('afterbegin', row);
         });
     } else {
-        gamesList.innerHTML = "<tr><td colspan='2'>Список пока пуст...</td></tr>";
+        gamesList.innerHTML = "<tr><td colspan='2' style='text-align:center;'>Список заявок пуст...</td></tr>";
     }
+}, (error) => {
+    console.error("Ошибка при получении данных: ", error);
 });
