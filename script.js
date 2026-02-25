@@ -39,6 +39,7 @@ async function fetchAppData(appUrl) {
 
 window.addGame = async function() {
     const urlInput = document.getElementById('appUrl');
+    const submitBtn = document.getElementById('submitBtn');
     const url = urlInput.value.trim();
 
     if (url === "") {
@@ -46,24 +47,32 @@ window.addGame = async function() {
         return;
     }
 
-    const appData = await fetchAppData(url);
+    // UI Feedback
+    const originalText = submitBtn.innerHTML;
+    submitBtn.innerHTML = '<div class="spinner" style="width:20px;height:20px;border-width:2px;"></div> Processing...';
+    submitBtn.disabled = true;
 
-    const gamesRef = ref(db, 'games');
-    const newGameRef = push(gamesRef);
-    
-    set(newGameRef, {
-        url: url,
-        appName: appData.name,   
-        appIcon: appData.icon,   
-        status: "Pending", // Default English status
-        timestamp: Date.now()
-    }).then(() => {
+    try {
+        const appData = await fetchAppData(url);
+
+        const gamesRef = ref(db, 'games');
+        const newGameRef = push(gamesRef);
+        
+        await set(newGameRef, {
+            url: url,
+            appName: appData.name,   
+            appIcon: appData.icon,   
+            status: "Pending",
+            timestamp: Date.now()
+        });
+
         urlInput.value = "";
-        console.log("Request sent successfully!");
-    }).catch((error) => {
-        alert("Access denied! Please check your permissions.");
-        console.error(error);
-    });
+    } catch (error) {
+        alert("Error sending request: " + error.message);
+    } finally {
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+    }
 };
 
 const gamesDisplayRef = query(ref(db, 'games'), orderByChild('timestamp'));
@@ -73,37 +82,53 @@ onValue(gamesDisplayRef, (snapshot) => {
     gamesList.innerHTML = "";
 
     if (snapshot.exists()) {
-        snapshot.forEach((childSnapshot) => {
-            const game = childSnapshot.val();
-            
-            let statusClass = "status-default";
-            let displayStatus = game.status;
+        const games = [];
+        snapshot.forEach((child) => {
+            games.push(child.val());
+        });
 
-            // Handle legacy Russian statuses and English mapping
+        // Reverse to show newest first
+        games.reverse().forEach((game) => {
+            
+            // Status Logic
+            let statusClass = "st-pending";
+            let displayStatus = "PENDING";
+            let statusIcon = "time-outline";
+
             if (game.status === "Processing" || game.status === "В работе") {
-                statusClass = "status-working";
-                displayStatus = "Processing";
+                statusClass = "st-processing";
+                displayStatus = "WORKING";
+                statusIcon = "sync-outline";
             } else if (game.status === "Ready" || game.status === "Готово") {
-                statusClass = "status-ready";
-                displayStatus = "Ready";
-            } else {
-                displayStatus = "Pending";
+                statusClass = "st-ready";
+                displayStatus = "READY";
+                statusIcon = "checkmark-circle-outline";
             }
 
-            const row = `
-                <tr>
-                    <td class="app-cell">
-                        <img src="${game.appIcon || 'https://placehold.jp/40x40.png'}" class="app-icon" alt="icon">
-                        <div class="app-info">
-                            <a href="${game.url}" target="_blank" class="app-name">${game.appName || 'Unknown App'}</a>
-                        </div>
-                    </td>
-                    <td><b class="${statusClass}">${displayStatus}</b></td>
-                </tr>
+            const time = new Date(game.timestamp).toLocaleDateString();
+
+            const card = document.createElement('div');
+            card.className = 'game-card';
+            card.innerHTML = `
+                <img src="${game.appIcon || 'https://placehold.jp/40x40.png'}" class="game-icon" alt="icon">
+                <div class="game-info">
+                    <a href="${game.url}" target="_blank" class="game-name">${game.appName || 'Unknown App'}</a>
+                    <div class="game-meta">
+                        <ion-icon name="calendar-outline"></ion-icon> ${time}
+                    </div>
+                </div>
+                <div class="status-badge ${statusClass}">
+                    ${displayStatus}
+                </div>
             `;
-            gamesList.insertAdjacentHTML('afterbegin', row);
+            gamesList.appendChild(card);
         });
     } else {
-        gamesList.innerHTML = "<tr><td colspan='2' style='text-align:center;'>No requests found...</td></tr>";
+        gamesList.innerHTML = `
+            <div class="loading-state">
+                <ion-icon name="file-tray-outline" style="font-size: 40px; opacity: 0.3;"></ion-icon>
+                <span>No requests yet...</span>
+            </div>
+        `;
     }
 });
