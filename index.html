@@ -2,33 +2,48 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>URSA Registry</title>
     <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700&family=Unbounded:wght@700;900&display=swap" rel="stylesheet">
+    <script type="module" src="https://unpkg.com/ionicons@7/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7/dist/ionicons/ionicons.js"></script>
 </head>
 <body>
-    <div class="container">
-        <h1>AppStore Game Registration</h1>
+    
+    <div class="background-glow"></div>
+
+    <div class="main-container">
+        <header>
+            <div class="logo-area">
+                <ion-icon name="cube-outline"></ion-icon>
+                <h1>URSA <span>REGISTRY</span></h1>
+            </div>
+            <p class="subtitle">Submit AppStore games for modification</p>
+        </header>
         
-        <div class="add-box">
-            <input type="text" id="appUrl" placeholder="Paste AppStore link (https://apps.apple.com/...)">
-            <button onclick="addGame()">Register</button>
+        <div class="input-card">
+            <div class="input-wrapper">
+                <ion-icon name="logo-apple" class="input-icon"></ion-icon>
+                <input type="text" id="appUrl" placeholder="Paste AppStore Link here...">
+            </div>
+            <button onclick="addGame()" id="submitBtn">
+                <span>REGISTER</span>
+                <ion-icon name="arrow-forward"></ion-icon>
+            </button>
         </div>
 
-        <hr>
+        <div class="list-header">
+            <h2>Queue List</h2>
+            <div class="live-dot"></div>
+        </div>
 
-        <h2>Application List</h2>
-        <table id="gamesTable">
-            <thead>
-                <tr>
-                    <th>App</th>
-                    <th>Status</th>
-                </tr>
-            </thead>
-            <tbody id="gamesList">
-                <tr><td colspan="2" style="text-align:center;">Loading list...</td></tr>
-            </tbody>
-        </table>
+        <div id="gamesList" class="games-grid">
+            <div class="loading-state">
+                <div class="spinner"></div>
+                <span>Syncing Database...</span>
+            </div>
+        </div>
     </div>
 
     <script type="module" src="script.js"></script>
