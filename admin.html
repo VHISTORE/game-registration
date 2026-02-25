@@ -2,50 +2,78 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>URSA Admin Panel</title>
     <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700&family=Unbounded:wght@700;900&display=swap" rel="stylesheet">
+    <script type="module" src="https://unpkg.com/ionicons@7/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7/dist/ionicons/ionicons.js"></script>
+    
     <style>
-        .admin-controls { display: flex; gap: 8px; }
-        .btn-status { 
-            padding: 6px 12px; 
-            font-size: 11px; 
-            text-transform: uppercase; 
-            letter-spacing: 0.5px; 
-            font-weight: bold; 
-            border-radius: 5px; 
-            border: none; 
-            cursor: pointer; 
-            color: white; 
+        /* Дополнительные стили чисто для админки */
+        .logout-btn {
+            background: rgba(255, 69, 58, 0.15) !important; color: #ff453a !important;
+            border: 1px solid rgba(255, 69, 58, 0.3) !important; width: auto !important;
+            padding: 8px 16px !important; font-size: 12px !important; margin-left: auto;
         }
-        .btn-delete { background-color: #ff3b30; }
-        .btn-work { background-color: #ff9f0a; }
-        .btn-ready { background-color: #30d158; }
-        #login-section { text-align: center; margin-top: 50px; }
+        
+        .admin-actions {
+            display: flex; gap: 8px; margin-top: 10px; justify-content: flex-end;
+        }
+
+        .action-btn {
+            padding: 8px 14px; border-radius: 12px; font-size: 11px; font-weight: 700;
+            cursor: pointer; border: none; display: flex; align-items: center; gap: 6px;
+            transition: 0.2s; text-transform: uppercase;
+        }
+
+        .btn-process { background: rgba(255, 159, 10, 0.2); color: #ff9f0a; border: 1px solid rgba(255, 159, 10, 0.3); }
+        .btn-ready { background: rgba(48, 209, 88, 0.2); color: #30d158; border: 1px solid rgba(48, 209, 88, 0.3); }
+        .btn-delete { background: rgba(255, 69, 58, 0.2); color: #ff453a; border: 1px solid rgba(255, 69, 58, 0.3); }
+
+        .auth-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(20px);
+            display: flex; align-items: center; justify-content: center; z-index: 1000;
+        }
+        .auth-box {
+            background: rgba(20, 25, 40, 0.8); border: 1px solid rgba(255,255,255,0.1);
+            padding: 30px; border-radius: 24px; text-align: center;
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>URSA Admin Panel</h1>
+    
+    <div class="background-glow"></div>
 
-        <div id="login-section">
-            <p>Please log in with Google to manage requests:</p>
-            <button onclick="login()">Login as Admin</button>
+    <div id="login-section" class="auth-overlay">
+        <div class="auth-box">
+            <h2>URSA ADMIN</h2>
+            <p style="color: #888; font-size: 13px; margin-bottom: 20px;">Restricted Access Area</p>
+            <button onclick="login()" style="width: 100%;">
+                <ion-icon name="logo-google"></ion-icon> Sign In
+            </button>
+        </div>
+    </div>
+
+    <div id="admin-section" class="main-container" style="display: none;">
+        <header style="display: flex; align-items: center; justify-content: space-between;">
+            <div class="logo-area" style="margin: 0;">
+                <ion-icon name="construct-outline"></ion-icon>
+                <h1>URSA <span>CONTROL</span></h1>
+            </div>
+            <button onclick="logout()" class="logout-btn">LOGOUT</button>
+        </header>
+
+        <div class="list-header">
+            <h2>Active Requests</h2>
+            <div class="live-dot"></div>
         </div>
 
-        <div id="admin-section" style="display: none;">
-            <h2>Manage Requests</h2>
-            <table id="adminTable">
-                <thead>
-                    <tr>
-                        <th>App</th>
-                        <th>Status</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="adminList">
-                    </tbody>
-            </table>
+        <div id="adminList" class="games-grid">
+            <div class="loading-state">
+                <div class="spinner"></div>
+                <span>Loading Data...</span>
+            </div>
         </div>
     </div>
 
