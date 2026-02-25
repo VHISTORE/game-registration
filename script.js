@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getDatabase, ref, push, set, onValue, query, orderByChild } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+import { getDatabase, ref, push, set, onValue, query, orderByChild, equalTo, get } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
 const firebaseConfig = {
     apiKey: "AIzaSyCQxz47mev45XXLz3ejJViVQCzFL_Fo3z8",
@@ -40,22 +40,41 @@ async function fetchAppData(appUrl) {
 window.addGame = async function() {
     const urlInput = document.getElementById('appUrl');
     const submitBtn = document.getElementById('submitBtn');
-    const url = urlInput.value.trim();
+    let url = urlInput.value.trim();
 
     if (url === "") {
         alert("Please paste an AppStore link!");
         return;
     }
 
-    // UI Feedback
+    // Очищаем URL от мусора (параметров после ?), чтобы избежать дублей из-за разной рекламы
+    url = url.split('?')[0];
+
+    // UI Feedback: Start Loading
     const originalText = submitBtn.innerHTML;
-    submitBtn.innerHTML = '<div class="spinner" style="width:20px;height:20px;border-width:2px;"></div> Processing...';
+    submitBtn.innerHTML = '<div class="spinner" style="width:20px;height:20px;border-width:2px;"></div> Checking...';
     submitBtn.disabled = true;
 
     try {
+        // --- 1. ПРОВЕРКА НА ДУБЛИКАТЫ ---
+        const gamesRef = ref(db, 'games');
+        // Делаем запрос: найти запись, у которой поле 'url' равно нашему url
+        const duplicateQuery = query(gamesRef, orderByChild('url'), equalTo(url));
+        const snapshot = await get(duplicateQuery);
+
+        if (snapshot.exists()) {
+            alert("⚠️ This game is already in the queue!");
+            // Сбрасываем кнопку и выходим
+            submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
+            return;
+        }
+
+        // --- 2. ЕСЛИ НЕ ДУБЛИКАТ, ПРОДОЛЖАЕМ ---
+        submitBtn.innerHTML = '<div class="spinner" style="width:20px;height:20px;border-width:2px;"></div> Fetching Data...';
+        
         const appData = await fetchAppData(url);
 
-        const gamesRef = ref(db, 'games');
         const newGameRef = push(gamesRef);
         
         await set(newGameRef, {
@@ -67,8 +86,11 @@ window.addGame = async function() {
         });
 
         urlInput.value = "";
+        // Можно добавить красивое уведомление вместо alert, если захочешь
+        console.log("Game registered successfully");
+
     } catch (error) {
-        alert("Error sending request: " + error.message);
+        alert("Error: " + error.message);
     } finally {
         submitBtn.innerHTML = originalText;
         submitBtn.disabled = false;
